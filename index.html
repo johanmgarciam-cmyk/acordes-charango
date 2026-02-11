@@ -9,45 +9,39 @@
 <body>
 <header>
   <h1>Editor de Acordes de Charango</h1>
-  <p>Interactivo + Reconocimiento de acordes</p>
+  <p>Funcional para crear, escuchar, guardar y validar acordes</p>
 </header>
 
 <div class="container">
   <div class="info">
-    <strong>Afinación estándar:</strong><br>
-    5ª G4 · 4ª C5 · 3ª E4/E5 · 2ª A4 · 1ª E5
-  </div>
-
-  <!-- Este div contendrá el charango -->
-  <div id="charango-container"></div>
-
-  <div class="info">
-    <strong>Notas seleccionadas:</strong>
-    <ul id="selectedNotes"></ul>
-    <div id="recognizedChord"></div>
+    <strong>Notas del acorde:</strong>
+    <input id="noteInput" placeholder="Ej: C E G">
+    <button id="playBtn">Escuchar acorde</button>
+    <button id="saveBtn">Guardar acorde</button>
   </div>
 
   <div class="info">
-    <input id="chordName" placeholder="Nombre para guardar">
-    <button id="playChordBtn">Escuchar acorde</button>
-    <button id="saveChordBtn">Guardar acorde</button>
+    <strong>Nombre del acorde:</strong>
+    <input id="chordName" placeholder="Ej: C mayor">
+  </div>
+
+  <div class="info">
+    <strong>Acordes guardados:</strong>
+    <pre id="saved"></pre>
     <button id="downloadBtn">Descargar biblioteca</button>
   </div>
 
   <div class="info">
-    <strong>Cejilla</strong>
-    <input type="number" id="barreFret" placeholder="Número de traste (0-18)">
-    <button id="applyBarreBtn">Aplicar cejilla</button>
-    <button id="clearBarreBtn">Quitar cejilla</button>
+    <strong>Acorde detectado:</strong>
+    <div id="recognizedChord">Ninguno</div>
   </div>
 
   <div class="info">
-    <strong>Acordes guardados</strong>
-    <pre id="saved"></pre>
+    <strong>Notas válidas en escala:</strong>
+    <div id="scaleCheck">Ninguna</div>
   </div>
 </div>
 
-<!-- Scripts cargados con defer -->
 <script src="https://cdn.jsdelivr.net/npm/tone@14.8.50/build/Tone.js" defer></script>
 <script src="app.js" defer></script>
 </body>
