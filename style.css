@@ -6,5 +6,4 @@ header { background: #2f5d50; color: white; padding: 12px; text-align: center; }
 .cell.active { background: #ffd966; border-color: #c9a400; }
 .cell.barre { background: #b3d9ff; border-color: #2f5d50; }
 .info { background: white; padding: 10px; border-radius: 6px; margin: 10px 0; }
-.controls input, .barre-controls input { padding: 8px; width: 100%; margin-top: 6px; }
-.controls button, .barre-controls button { padding: 8px; width: 100%; margin-top: 6px; }
+input, button { padding: 8px; width: 100%; margin-top: 6px; }
