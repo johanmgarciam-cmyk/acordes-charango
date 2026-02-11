@@ -1,5 +1,5 @@
 // ==============================
-//  VARIABLES PRINCIPALES
+// VARIABLES PRINCIPALES
 // ==============================
 const notes = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
 const frets = 18;
@@ -12,11 +12,11 @@ const tuning = [
   { name: 'E', freqs: [659.25] }
 ];
 
-let selected = [];       // Notas seleccionadas
+let selected = [];
 const charangoDiv = document.getElementById('charango');
 
 // ==============================
-//  CREAR DIAPASÓN
+// CREAR DIAPASÓN
 // ==============================
 tuning.forEach((string, s) => {
   for (let f = 0; f <= frets; f++) {
@@ -32,7 +32,7 @@ tuning.forEach((string, s) => {
 });
 
 // ==============================
-//  FUNCIONES DE INTERACCIÓN
+// FUNCIONES DE INTERACCIÓN
 // ==============================
 function toggleCell(cell, s, f, note) {
   const idx = selected.findIndex(n => n.s === s && n.f === f);
@@ -52,7 +52,7 @@ function freqsAt(stringIndex, fret) {
 }
 
 // ==============================
-//  AUDIO CON TONE.JS
+// AUDIO CON TONE.JS
 // ==============================
 function playFreqs(freqs) {
   freqs.forEach(freq => {
@@ -63,7 +63,7 @@ function playFreqs(freqs) {
 }
 
 // ==============================
-//  RENDER NOTAS SELECCIONADAS
+// RENDER NOTAS SELECCIONADAS
 // ==============================
 function renderSelected() {
   const ul = document.getElementById('selectedNotes');
@@ -76,7 +76,7 @@ function renderSelected() {
 }
 
 // ==============================
-//  EVENTOS DE BOTONES
+// EVENTOS DE BOTONES
 // ==============================
 document.getElementById('playChordBtn').onclick = () => {
   selected.forEach(n => playFreqs(freqsAt(n.s,n.f)));
@@ -93,6 +93,6 @@ document.getElementById('saveChordBtn').onclick = () => {
 };
 
 // ==============================
-//  INICIALIZACIÓN
+// INICIALIZACIÓN
 // ==============================
 document.getElementById('saved').textContent = localStorage.getItem('charangoChords') || '';
