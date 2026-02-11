@@ -1,3 +1,5 @@
+document.addEventListener('DOMContentLoaded', () => {
+
 const frets = 18;
 const tuning = [
   ['G4','G4'],
@@ -12,13 +14,13 @@ let barre = null;
 
 const container = document.getElementById('charango-container');
 
-// SINTETIZADOR
+// Sintetizador
 const synth = new Tone.PolySynth(Tone.Synth, {
   oscillator: { type:"triangle" },
   envelope: { attack:0.01, decay:0.2, sustain:0.3, release:1 }
 }).toDestination();
 
-// FORMULAS DE ACORDES
+// Formulas acordes básicos
 const chordFormulas={
   'C':['C','E','G'],
   'Cm':['C','D#','G'],
@@ -38,7 +40,7 @@ const chordFormulas={
   'Bm':['B','D','F#']
 };
 
-// CREAR DIAPASÓN
+// Crear diapasón
 function createFretboard(){
   container.innerHTML='';
   for(let order=0; order<5; order++){
@@ -67,7 +69,7 @@ function createFretboard(){
   }
 }
 
-// TOGGLE CELDA
+// Toggle celda
 function toggleCell(cell,order,rep,fret,note){
   const idx = selected.findIndex(n=>n.order===order && n.rep===rep && n.fret===fret);
   if(idx>=0){
@@ -82,7 +84,7 @@ function toggleCell(cell,order,rep,fret,note){
   recognizeChord();
 }
 
-// RENDER SELECCION
+// Render notas seleccionadas
 function renderSelected(){
   const ul = document.getElementById('selectedNotes');
   ul.innerHTML='';
@@ -93,7 +95,7 @@ function renderSelected(){
   });
 }
 
-// CEJILLA / BARRE
+// Cejilla
 document.getElementById('applyBarreBtn').onclick = ()=>{
   const fret = parseInt(document.getElementById('barreFret').value);
   if(isNaN(fret)||fret<0||fret>frets) return;
@@ -112,7 +114,7 @@ document.getElementById('clearBarreBtn').onclick = ()=>{
   recognizeChord();
 };
 
-// BOTONES
+// Botones
 document.getElementById('playChordBtn').onclick = ()=>selected.forEach(n=>synth.triggerAttackRelease(n.note,"0.8"));
 
 document.getElementById('saveChordBtn').onclick = ()=>{
@@ -133,7 +135,7 @@ document.getElementById('downloadBtn').onclick=()=>{
   dlAnchor.click();
 };
 
-// RECONOCIMIENTO ACORDES
+// Reconocimiento acordes
 function recognizeChord(){
   const selNotes = [...new Set(selected.map(n=>n.note.replace(/\d/,'')))];
   const div = document.getElementById('recognizedChord');
@@ -148,6 +150,8 @@ function recognizeChord(){
   div.innerHTML = `<strong>Acorde detectado:</strong> Ninguno`;
 }
 
-// INICIALIZAR
+// Inicializar
 createFretboard();
 document.getElementById('saved').textContent = localStorage.getItem('charangoChords')||'';
+
+});
