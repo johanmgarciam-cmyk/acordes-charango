@@ -1,18 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
-
-const frets = 18;
-const tuning = [
-  ['G4','G4'],
-  ['C5','C5'],
-  ['E4','E5'],
-  ['A4','A4'],
-  ['E5','E5']
-];
-
-let selected = [];
-let barre = null;
-
-const container = document.getElementById('charango-container');
+document.addEventListener('DOMContentLoaded', ()=>{
 
 // Sintetizador
 const synth = new Tone.PolySynth(Tone.Synth, {
@@ -31,103 +17,46 @@ const chordFormulas={
   'E':['E','G#','B'],
   'Em':['E','G','B'],
   'F':['F','A','C'],
-  'Fm':['F','G#','C'],
   'G':['G','B','D'],
-  'Gm':['G','A#','D'],
-  'A':['A','C#','E'],
-  'Am':['A','C','E'],
-  'B':['B','D#','F#'],
-  'Bm':['B','D','F#']
+  'Am':['A','C','E']
 };
 
-// Crear diapasón
-function createFretboard(){
-  container.innerHTML='';
-  for(let order=0; order<5; order++){
-    const row = document.createElement('div');
-    row.className='charango-row';
-
-    for(let stringRep=0; stringRep<2; stringRep++){
-      for(let fret=0; fret<=frets; fret++){
-        const cell = document.createElement('div');
-        cell.className='cell';
-        const note = tuning[order][stringRep];
-        cell.dataset.order = order;
-        cell.dataset.rep = stringRep;
-        cell.dataset.fret = fret;
-        cell.textContent = `O${5-order}\nT${fret}\n${note}`;
-
-        if(barre && fret===barre.fret) cell.classList.add('barre');
-
-        cell.onclick = ()=>toggleCell(cell,order,stringRep,fret,note);
-
-        row.appendChild(cell);
-      }
-    }
-
-    container.appendChild(row);
-  }
-}
-
-// Toggle celda
-function toggleCell(cell,order,rep,fret,note){
-  const idx = selected.findIndex(n=>n.order===order && n.rep===rep && n.fret===fret);
-  if(idx>=0){
-    selected.splice(idx,1);
-    cell.classList.remove('active');
-  }else{
-    selected.push({order,rep,fret,note});
-    cell.classList.add('active');
-    synth.triggerAttackRelease(note,"0.8");
-  }
-  renderSelected();
-  recognizeChord();
-}
-
-// Render notas seleccionadas
-function renderSelected(){
-  const ul = document.getElementById('selectedNotes');
-  ul.innerHTML='';
-  selected.forEach(n=>{
-    const li = document.createElement('li');
-    li.textContent = `O${5-n.order}, cuerda ${n.rep+1}, T${n.fret} → ${n.note}`;
-    ul.appendChild(li);
-  });
-}
-
-// Cejilla
-document.getElementById('applyBarreBtn').onclick = ()=>{
-  const fret = parseInt(document.getElementById('barreFret').value);
-  if(isNaN(fret)||fret<0||fret>frets) return;
-  barre={fret};
-  selected=[];
-  createFretboard();
-  renderSelected();
-  recognizeChord();
+// Escalas básicas
+const scales = {
+  'C':['C','D','E','F','G','A','B'],
+  'G':['G','A','B','C','D','E','F#'],
+  'D':['D','E','F#','G','A','B','C#']
 };
 
-document.getElementById('clearBarreBtn').onclick = ()=>{
-  barre=null;
-  selected=[];
-  createFretboard();
-  renderSelected();
-  recognizeChord();
+const noteInput = document.getElementById('noteInput');
+const chordNameInput = document.getElementById('chordName');
+const recognizedChord = document.getElementById('recognizedChord');
+const savedDisplay = document.getElementById('saved');
+const scaleCheckDiv = document.getElementById('scaleCheck');
+
+// Escuchar acorde
+document.getElementById('playBtn').onclick = ()=>{
+  const notes = getNotes();
+  if(!notes.length) return;
+  synth.triggerAttackRelease(notes,"1");
+  recognizeChord(notes);
+  validateScale(notes);
 };
 
-// Botones
-document.getElementById('playChordBtn').onclick = ()=>selected.forEach(n=>synth.triggerAttackRelease(n.note,"0.8"));
-
-document.getElementById('saveChordBtn').onclick = ()=>{
-  const name = document.getElementById('chordName').value || 'Sin nombre';
-  const data = {name,positions:selected.map(n=>({order:n.order,rep:n.rep,fret:n.fret,note:n.note}))};
+// Guardar acorde
+document.getElementById('saveBtn').onclick = ()=>{
+  const name = chordNameInput.value || 'Sin nombre';
+  const notes = getNotes();
+  if(!notes.length) return alert("Ingresa las notas");
+  const data = {name, notes};
   const saved = JSON.parse(localStorage.getItem('charangoChords')||'[]');
   saved.push(data);
   localStorage.setItem('charangoChords',JSON.stringify(saved,null,2));
-  document.getElementById('saved').textContent = JSON.stringify(saved,null,2);
-  alert('Acorde guardado');
+  renderSaved();
 };
 
-document.getElementById('downloadBtn').onclick=()=>{
+// Descargar biblioteca
+document.getElementById('downloadBtn').onclick = ()=>{
   const dataStr = "data:text/json;charset=utf-8,"+encodeURIComponent(localStorage.getItem('charangoChords')||'[]');
   const dlAnchor = document.createElement('a');
   dlAnchor.setAttribute("href",dataStr);
@@ -135,23 +64,42 @@ document.getElementById('downloadBtn').onclick=()=>{
   dlAnchor.click();
 };
 
-// Reconocimiento acordes
-function recognizeChord(){
-  const selNotes = [...new Set(selected.map(n=>n.note.replace(/\d/,'')))];
-  const div = document.getElementById('recognizedChord');
-  div.innerHTML='';
+// Renderizar guardados
+function renderSaved(){
+  savedDisplay.textContent = localStorage.getItem('charangoChords')||'';
+}
+
+// Obtener notas ingresadas
+function getNotes(){
+  return noteInput.value.toUpperCase().trim().split(/\s+/);
+}
+
+// Reconocer acorde
+function recognizeChord(notes){
+  const selNotes = [...new Set(notes.map(n=>n.replace(/\d/,"")))];
   for(let chord in chordFormulas){
     const formula = chordFormulas[chord];
     if(formula.every(note=>selNotes.includes(note)) && formula.length===selNotes.length){
-      div.innerHTML = `<strong>Acorde detectado:</strong> ${chord}`;
+      recognizedChord.textContent = chord;
       return;
     }
   }
-  div.innerHTML = `<strong>Acorde detectado:</strong> Ninguno`;
+  recognizedChord.textContent = "Ninguno";
+}
+
+// Validar notas en la escala
+function validateScale(notes){
+  const selNotes = [...new Set(notes.map(n=>n.replace(/\d/,"")))];
+  let validNotes = [];
+  for(let note of selNotes){
+    for(let scale in scales){
+      if(scales[scale].includes(note)) validNotes.push(`${note} en ${scale}`);
+    }
+  }
+  scaleCheckDiv.textContent = validNotes.length? validNotes.join(", "): "Ninguna";
 }
 
 // Inicializar
-createFretboard();
-document.getElementById('saved').textContent = localStorage.getItem('charangoChords')||'';
+renderSaved();
 
 });
