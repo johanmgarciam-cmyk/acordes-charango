@@ -18,6 +18,7 @@
     5ª G4 · 4ª C5 · 3ª E4/E5 · 2ª A4 · 1ª E5
   </div>
 
+  <!-- Este div contendrá el charango -->
   <div id="charango-container"></div>
 
   <div class="info">
@@ -28,4 +29,26 @@
 
   <div class="info">
     <input id="chordName" placeholder="Nombre para guardar">
-    <butto
+    <button id="playChordBtn">Escuchar acorde</button>
+    <button id="saveChordBtn">Guardar acorde</button>
+    <button id="downloadBtn">Descargar biblioteca</button>
+  </div>
+
+  <div class="info">
+    <strong>Cejilla</strong>
+    <input type="number" id="barreFret" placeholder="Número de traste (0-18)">
+    <button id="applyBarreBtn">Aplicar cejilla</button>
+    <button id="clearBarreBtn">Quitar cejilla</button>
+  </div>
+
+  <div class="info">
+    <strong>Acordes guardados</strong>
+    <pre id="saved"></pre>
+  </div>
+</div>
+
+<!-- Scripts cargados con defer -->
+<script src="https://cdn.jsdelivr.net/npm/tone@14.8.50/build/Tone.js" defer></script>
+<script src="app.js" defer></script>
+</body>
+</html>
