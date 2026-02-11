@@ -4,20 +4,19 @@
 const notes = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
 const frets = 18;
 
-// 10 cuerdas / 5 órdenes
 const tuning = [
-  { notes: ['G4','G4'] },           // 5ª cuerda (grave)
+  { notes: ['G4','G4'] },           // 5ª cuerda
   { notes: ['C5','C5'] },           // 4ª cuerda
   { notes: ['E4','E5'] },           // 3ª cuerda octavada
   { notes: ['A4','A4'] },           // 2ª cuerda
-  { notes: ['E5','E5'] }            // 1ª cuerda (aguda)
+  { notes: ['E5','E5'] }            // 1ª cuerda
 ];
 
 let selected = [];
 let barre = null;
 
 // ==============================
-// SINTETIZADOR REALISTA
+// SINTETIZADOR POLIFÓNICO
 // ==============================
 const synth = new Tone.PolySynth(Tone.Synth, {
   oscillator: { type: "triangle" },
@@ -29,7 +28,6 @@ const synth = new Tone.PolySynth(Tone.Synth, {
 // ==============================
 function noteAt(stringIndex,fret){
   const stringNotes = tuning[stringIndex].notes;
-  // subimos octava por semitono
   return stringNotes.map(n=>{
     const noteBase = n.replace(/\d/,'');
     const octave = parseInt(n.match(/\d/)[0]);
@@ -61,14 +59,6 @@ function createFretboard(){
 }
 
 // ==============================
-// CARGAR DIAPASÓN DESPUÉS DEL DOM
-// ==============================
-document.addEventListener('DOMContentLoaded', ()=>{
-    createFretboard();
-    document.getElementById('saved').textContent = localStorage.getItem('charangoChords')||'';
-});
-
-// ==============================
 // INTERACCIÓN CELDAS
 // ==============================
 function toggleCell(cell,s,f){
@@ -83,6 +73,7 @@ function toggleCell(cell,s,f){
     playNotes(notesToPlay);
   }
   renderSelected();
+  recognizeChord();
 }
 
 // ==============================
@@ -91,9 +82,7 @@ function toggleCell(cell,s,f){
 function playNotes(notesArr){
   notesArr.forEach(n=>{
     const velocity = 0.2 + Math.random()*0.3;
-    const detune = (Math.random()-0.5)*10;
     synth.triggerAttackRelease(n,"0.8",undefined,velocity);
-    synth.set({detune});
   });
 }
 
@@ -120,6 +109,7 @@ document.getElementById('applyBarreBtn').onclick = () => {
   selected = [];
   createFretboard();
   renderSelected();
+  recognizeChord();
 };
 
 document.getElementById('clearBarreBtn').onclick = () => {
@@ -127,6 +117,7 @@ document.getElementById('clearBarreBtn').onclick = () => {
   selected = [];
   createFretboard();
   renderSelected();
+  recognizeChord();
 };
 
 // ==============================
@@ -138,10 +129,54 @@ document.getElementById('playChordBtn').onclick = () => {
 
 document.getElementById('saveChordBtn').onclick = ()=>{
   const name = document.getElementById('chordName').value || 'Sin nombre';
-  const data = { name, positions: selected };
+  const data = { name, positions: selected.map(n=>({s:n.s,f:n.f,notes:n.notes})) };
   const saved = JSON.parse(localStorage.getItem('charangoChords')||'[]');
   saved.push(data);
   localStorage.setItem('charangoChords',JSON.stringify(saved,null,2));
   document.getElementById('saved').textContent = JSON.stringify(saved,null,2);
   alert('Acorde guardado');
 };
+
+document.getElementById('downloadBtn').onclick = ()=>{
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(localStorage.getItem('charangoChords')||'[]');
+  const dlAnchor = document.createElement('a');
+  dlAnchor.setAttribute("href", dataStr);
+  dlAnchor.setAttribute("download","charango_chords.json");
+  dlAnchor.click();
+};
+
+// ==============================
+// RECONOCIMIENTO DE ACORDES
+// ==============================
+const chordFormulas = {
+  'C': ['C','E','G'],
+  'Cm': ['C','D#','G'],
+  'C7': ['C','E','G','A#'],
+  'D': ['D','F#','A'],
+  'Dm': ['D','F','A'],
+  'D7': ['D','F#','A','C'],
+  'E': ['E','G#','B'],
+  'Em': ['E','G','B'],
+  'F': ['F','A','C'],
+  'Fm': ['F','G#','C'],
+  'G': ['G','B','D'],
+  'Gm': ['G','A#','D'],
+  'A': ['A','C#','E'],
+  'Am': ['A','C','E'],
+  'B': ['B','D#','F#'],
+  'Bm': ['B','D','F#']
+};
+
+function recognizeChord(){
+  const selectedNotes = [...new Set(selected.flatMap(n=>n.notes.map(n=>n.replace(/\d/,''))))];
+  const recognizedDiv = document.getElementById('recognizedChord');
+  recognizedDiv.innerHTML = '';
+  for(let chord in chordFormulas){
+    const formula = chordFormulas[chord];
+    if(formula.every(note=>selectedNotes.includes(note)) && formula.length===selectedNotes.length){
+      recognizedDiv.innerHTML = `<strong>Acorde detectado:</strong> ${chord}`;
+      return;
+    }
+  }
+  recognizedDiv.innerHTML = `<strong>Acorde detectado:</strong> Ninguno`;
+}
