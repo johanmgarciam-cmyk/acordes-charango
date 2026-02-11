@@ -1,40 +1,50 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Editor de Acordes de Charango</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Biblioteca de Acordes de Charango</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-<header>
-  <h1>Editor de Acordes de Charango</h1>
-  <p>Interactivo funcional</p>
-</header>
+  <header>
+    <h1>Biblioteca de Acordes de Charango</h1>
+    <p>Interactúa con el diapasón y escucha los acordes</p>
+  </header>
 
-<div class="container">
-  <div class="info">
-    <strong>Notas del acorde (separadas por espacio):</strong>
-    <input id="noteInput" placeholder="Ej: C E G">
-  </div>
+  <main class="container">
+    <div class="info">
+      <strong>Afinación estándar:</strong> 5ª G4 · 4ª C5 · 3ª E4/E5 · 2ª A4 · 1ª E5
+    </div>
 
-  <div class="info">
-    <strong>Nombre del acorde:</strong>
-    <input id="chordName" placeholder="Ej: C mayor">
-  </div>
+    <div id="charango" class="charango"></div>
 
-  <div class="info">
-    <button id="playBtn">Escuchar acorde</button>
-    <button id="saveBtn">Guardar acorde</button>
-    <button id="downloadBtn">Descargar biblioteca</button>
-  </div>
+    <div class="info">
+      <strong>Notas seleccionadas:</strong>
+      <ul id="selectedNotes"></ul>
+    </div>
 
-  <div class="info">
-    <strong>Acordes guardados:</strong>
-    <pre id="saved"></pre>
-  </div>
-</div>
+    <div class="controls info">
+      <input id="chordName" placeholder="Nombre del acorde" />
+      <button id="playChordBtn">Escuchar acorde</button>
+      <button id="saveChordBtn">Guardar acorde</button>
+    </div>
 
-<script src="app.js"></script>
+    <div class="barre-controls info">
+      <input type="number" id="barreFret" placeholder="Número de traste (0-18)">
+      <button id="applyBarreBtn">Aplicar cejilla</button>
+      <button id="clearBarreBtn">Quitar cejilla</button>
+    </div>
+
+    <div class="saved-chords info">
+      <strong>Acordes guardados:</strong>
+      <pre id="saved"></pre>
+    </div>
+  </main>
+
+  <!-- Tone.js para reproducir audio -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.39/Tone.min.js"></script>
+  <!-- Script principal -->
+  <script src="app.js"></script>
 </body>
 </html>
