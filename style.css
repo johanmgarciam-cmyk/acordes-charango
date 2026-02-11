@@ -1,22 +1,5 @@
 body { font-family: Arial, sans-serif; margin:0; background:#f4f4f4; }
 header { background:#2f5d50; color:white; padding:12px; text-align:center; }
 .container { padding:12px; }
-
-.charango-row { display:flex; gap:3px; margin-bottom:5px; flex-wrap: wrap; }
-
-.cell {
-  width:50px; height:40px; border:1px solid #333;
-  text-align:center; font-size:11px; line-height:12px;
-  cursor:pointer; background:#fff; white-space:pre-line;
-}
-
-.cell.active { background:#ffd966; border-color:#c9a400; }
-.cell.barre { background:#b3d9ff; border-color:#2f5d50; }
-
 .info { background:white; padding:10px; border-radius:6px; margin:10px 0; }
 input, button { padding:8px; width:100%; margin-top:6px; }
-
-/* Responsive */
-@media(max-width:500px){
-  .cell { width:35px; height:30px; font-size:10px; line-height:11px; }
-}
