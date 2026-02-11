@@ -9,15 +9,13 @@
 <body>
 <header>
   <h1>Editor de Acordes de Charango</h1>
-  <p>Interactivo básico</p>
+  <p>Interactivo funcional</p>
 </header>
 
 <div class="container">
   <div class="info">
     <strong>Notas del acorde (separadas por espacio):</strong>
     <input id="noteInput" placeholder="Ej: C E G">
-    <button id="playBtn">Escuchar acorde</button>
-    <button id="saveBtn">Guardar acorde</button>
   </div>
 
   <div class="info">
@@ -26,9 +24,14 @@
   </div>
 
   <div class="info">
+    <button id="playBtn">Escuchar acorde</button>
+    <button id="saveBtn">Guardar acorde</button>
+    <button id="downloadBtn">Descargar biblioteca</button>
+  </div>
+
+  <div class="info">
     <strong>Acordes guardados:</strong>
     <pre id="saved"></pre>
-    <button id="downloadBtn">Descargar biblioteca</button>
   </div>
 </div>
 
