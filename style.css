@@ -2,22 +2,12 @@ body { font-family: Arial, sans-serif; margin:0; background:#f4f4f4; }
 header { background:#2f5d50; color:white; padding:12px; text-align:center; }
 .container { padding:12px; }
 
-.charango {
-  display:grid;
-  grid-template-columns: repeat(19, 60px);
-  gap: 3px;
-  overflow-x:auto;
-  padding-bottom:10px;
-}
+.charango-row { display:flex; gap:3px; margin-bottom:5px; }
 
 .cell {
-  background:white;
-  border:1px solid #ccc;
-  text-align:center;
-  padding:8px 2px;
-  font-size:11px;
-  cursor:pointer;
-  min-height:40px;
+  width:50px; height:40px; border:1px solid #333;
+  text-align:center; font-size:11px; line-height:12px;
+  cursor:pointer; background:#fff; white-space:pre-line;
 }
 
 .cell.active { background:#ffd966; border-color:#c9a400; }
@@ -26,8 +16,7 @@ header { background:#2f5d50; color:white; padding:12px; text-align:center; }
 .info { background:white; padding:10px; border-radius:6px; margin:10px 0; }
 input, button { padding:8px; width:100%; margin-top:6px; }
 
-/* Responsive para celular */
-@media (max-width: 500px){
-  .charango { grid-template-columns: repeat(19, 40px); }
-  .cell { min-height:30px; font-size:10px; }
+/* Responsive */
+@media(max-width:500px){
+  .cell { width:35px; height:30px; font-size:10px; line-height:11px; }
 }
