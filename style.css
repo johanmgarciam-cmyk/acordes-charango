@@ -1,27 +1,33 @@
-body { font-family: Arial, sans-serif; margin: 0; background: #f4f4f4; }
-header { background: #2f5d50; color: white; padding: 12px; text-align: center; }
-.container { padding: 12px; }
+body { font-family: Arial, sans-serif; margin:0; background:#f4f4f4; }
+header { background:#2f5d50; color:white; padding:12px; text-align:center; }
+.container { padding:12px; }
 
 .charango {
-  display: grid;
+  display:grid;
   grid-template-columns: repeat(19, 60px);
-  gap: 4px;
-  overflow-x: auto;
-  padding-bottom: 10px;
+  gap: 3px;
+  overflow-x:auto;
+  padding-bottom:10px;
 }
 
 .cell {
-  background: white;
-  border: 1px solid #ccc;
-  text-align: center;
-  padding: 10px 4px;
-  font-size: 12px;
-  cursor: pointer;
-  min-height: 50px;
+  background:white;
+  border:1px solid #ccc;
+  text-align:center;
+  padding:8px 2px;
+  font-size:11px;
+  cursor:pointer;
+  min-height:40px;
 }
 
-.cell.active { background: #ffd966; border-color: #c9a400; }
-.cell.barre { background: #b3d9ff; border-color: #2f5d50; }
+.cell.active { background:#ffd966; border-color:#c9a400; }
+.cell.barre { background:#b3d9ff; border-color:#2f5d50; }
 
-.info { background: white; padding: 10px; border-radius: 6px; margin: 10px 0; }
-input, button { padding: 8px; width: 100%; margin-top: 6px; }
+.info { background:white; padding:10px; border-radius:6px; margin:10px 0; }
+input, button { padding:8px; width:100%; margin-top:6px; }
+
+/* Responsive para celular */
+@media (max-width: 500px){
+  .charango { grid-template-columns: repeat(19, 40px); }
+  .cell { min-height:30px; font-size:10px; }
+}
