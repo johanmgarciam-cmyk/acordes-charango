@@ -1,45 +1,30 @@
-// ===============================
-// CHARANGO APP - STORAGE FIX
-// ===============================
-
-// Aseguramos que selected exista
-if (typeof selected === "undefined") {
-  var selected = {};
-}
-
-// Esperar que cargue el DOM
 document.addEventListener("DOMContentLoaded", function () {
 
   const saveBtn = document.getElementById("saveChordBtn");
 
-  if (!saveBtn) {
-    console.log("saveChordBtn not found");
-    return;
-  }
-
   saveBtn.addEventListener("click", function () {
 
-    if (!selected || Object.keys(selected).length === 0) {
-      alert("No chord selected");
+    if (!selected || selected.length === 0) {
+      alert("No notes selected");
       return;
     }
 
-    try {
-      let stored = JSON.parse(localStorage.getItem("charangoChords")) || [];
+    const chordName = document.getElementById("chordName").value || "Sin nombre";
 
-      stored.push(selected);
+    const chordData = {
+      name: chordName,
+      positions: selected
+    };
 
-      localStorage.setItem("charangoChords", JSON.stringify(stored));
+    let stored = JSON.parse(localStorage.getItem("charangoChords")) || [];
 
-      console.log("Saved:", selected);
-      alert("Chord saved successfully");
+    stored.push(chordData);
 
-    } catch (error) {
-      console.error("Storage error:", error);
-      alert("Error saving chord");
-    }
+    localStorage.setItem("charangoChords", JSON.stringify(stored));
+
+    console.log("Saved:", chordData);
+    alert("Chord saved successfully");
 
   });
 
 });
-
