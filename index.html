@@ -1,50 +1,182 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Biblioteca de Acordes de Charango</title>
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Editor de Acordes de Charango</title>
+
+<style>
+body { font-family: Arial, sans-serif; margin:0; background:#f4f4f4; }
+header { background:#2f5d50; color:white; padding:12px; text-align:center; }
+.container { padding:12px; }
+.charango { display:grid; grid-template-columns: repeat(19, 1fr); gap:4px; overflow-x:auto; }
+.cell { background:white; border:1px solid #ccc; text-align:center; padding:6px; font-size:11px; cursor:pointer; }
+.cell.active { background:#ffd966; border-color:#c9a400; }
+.info { background:white; padding:10px; border-radius:6px; margin:10px 0; }
+input, button { padding:8px; width:100%; margin-top:6px; }
+pre { white-space:pre-wrap; }
+</style>
 </head>
+
 <body>
-  <header>
-    <h1>Biblioteca de Acordes de Charango</h1>
-    <p>Interactúa con el diapasón y escucha los acordes</p>
-  </header>
 
-  <main class="container">
-    <div class="info">
-      <strong>Afinación estándar:</strong> 5ª G4 · 4ª C5 · 3ª E4/E5 · 2ª A4 · 1ª E5
-    </div>
+<header>
+<h1>Editor de Acordes de Charango</h1>
+<p>Biblioteca estructurada</p>
+</header>
 
-    <div id="charango" class="charango"></div>
+<div class="container">
 
-    <div class="info">
-      <strong>Notas seleccionadas:</strong>
-      <ul id="selectedNotes"></ul>
-    </div>
+<div class="info">
+<strong>Afinación estándar:</strong><br>
+G · C · E · A · E
+</div>
 
-    <div class="controls info">
-      <input id="chordName" placeholder="Nombre del acorde" />
-      <button id="playChordBtn">Escuchar acorde</button>
-      <button id="saveChordBtn">Guardar acorde</button>
-    </div>
+<div id="charango" class="charango"></div>
 
-    <div class="barre-controls info">
-      <input type="number" id="barreFret" placeholder="Número de traste (0-18)">
-      <button id="applyBarreBtn">Aplicar cejilla</button>
-      <button id="clearBarreBtn">Quitar cejilla</button>
-    </div>
+<div class="info">
+<strong>Nombre del acorde:</strong>
+<input id="chordName" placeholder="Ej: C (1ª)">
+<button onclick="saveChord()">Guardar acorde</button>
+<button onclick="exportLibrary()">Exportar biblioteca .txt</button>
+<button onclick="clearSelection()">Limpiar selección</button>
+</div>
 
-    <div class="saved-chords info">
-      <strong>Acordes guardados:</strong>
-      <pre id="saved"></pre>
-    </div>
-  </main>
+<div class="info">
+<strong>Biblioteca guardada</strong>
+<pre id="saved"></pre>
+</div>
 
-  <!-- Tone.js para reproducir audio -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.39/Tone.min.js"></script>
-  <!-- Script principal -->
-  <script src="app.js"></script>
+</div>
+
+<script>
+
+const notes = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const tuning = ['G','C','E','A','E'];
+const frets = 18;
+const charangoDiv = document.getElementById('charango');
+
+let selected = [];
+
+/* ============================= */
+/* CONSTRUCCIÓN DEL MÁSTIL */
+/* ============================= */
+
+function noteAt(stringIndex, fret) {
+  const baseIndex = notes.indexOf(tuning[stringIndex]);
+  return notes[(baseIndex + fret) % 12];
+}
+
+tuning.forEach((string, s) => {
+  for (let f = 0; f <= frets; f++) {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.dataset.string = s;
+    cell.dataset.fret = f;
+    cell.innerHTML = `T${f}`;
+    cell.onclick = () => toggleCell(cell, s, f);
+    charangoDiv.appendChild(cell);
+  }
+});
+
+function toggleCell(cell, s, f) {
+  const index = selected.findIndex(n => n.s === s);
+  
+  if (index >= 0) {
+    selected.splice(index,1);
+    document.querySelectorAll(`.cell[data-string='${s}']`)
+      .forEach(c => c.classList.remove('active'));
+  }
+
+  selected.push({ s, f });
+  cell.classList.add('active');
+}
+
+/* ============================= */
+/* GUARDAR ACORDE EN FORMATO LIMPIO */
+/* ============================= */
+
+function saveChord() {
+
+  const name = document.getElementById('chordName').value.trim();
+  if (!name) {
+    alert("Escribe el nombre del acorde");
+    return;
+  }
+
+  const library = JSON.parse(localStorage.getItem('charangoLibrary') || '[]');
+  const number = library.length + 1;
+
+  // Inicializar todas las cuerdas en 0
+  let fretsByString = [0,0,0,0,0];
+
+  selected.forEach(n => {
+    fretsByString[n.s] = n.f;
+  });
+
+  let tab =
+`${number}. ${name}
+────────────────────────────────────────
+Tablatura:
+
+G  ─ ${fretsByString[0]} ─
+C  ─ ${fretsByString[1]} ─
+E  ─ ${fretsByString[2]} ─
+A  ─ ${fretsByString[3]} ─
+E  ─ ${fretsByString[4]} ─`;
+
+  library.push(tab);
+
+  localStorage.setItem('charangoLibrary', JSON.stringify(library));
+
+  renderLibrary();
+  clearSelection();
+  document.getElementById('chordName').value = "";
+
+  alert("Acorde guardado correctamente");
+}
+
+/* ============================= */
+/* MOSTRAR BIBLIOTECA */
+/* ============================= */
+
+function renderLibrary() {
+  const library = JSON.parse(localStorage.getItem('charangoLibrary') || '[]');
+  document.getElementById('saved').textContent = library.join("\n\n");
+}
+
+renderLibrary();
+
+/* ============================= */
+/* LIMPIAR SELECCIÓN */
+/* ============================= */
+
+function clearSelection() {
+  selected = [];
+  document.querySelectorAll('.cell.active')
+    .forEach(c => c.classList.remove('active'));
+}
+
+/* ============================= */
+/* EXPORTAR A TXT */
+/* ============================= */
+
+function exportLibrary() {
+  const library = JSON.parse(localStorage.getItem('charangoLibrary') || '[]');
+  if (library.length === 0) {
+    alert("No hay acordes guardados");
+    return;
+  }
+
+  const blob = new Blob([library.join("\n\n")], { type: "text/plain" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "biblioteca_acordes_charango.txt";
+  link.click();
+}
+
+</script>
+
 </body>
 </html>
+
